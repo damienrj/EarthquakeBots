@@ -3,13 +3,22 @@ import requests
 import sqlite3 as sqlite
 
 
-def readfeed():
+def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson'):
     # Read the USGS json feed and return only relavant quantities.
-    feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson'
 
     resp = requests.get(feed_url)
     j = resp.json()
 
+    # go through the json file and insert into the database
+    n = len(j['features'])
+    for i in xrange(n):
+        dict_input = j['features'][i]['properties']
+        coord = j['features'][i]['geometry']['coordinates']
+        dict_input['longitude']=coord[0]
+        dict_input['latitude']=coord[1]
+        dict_input['depth']=coord[2]
+        insertdb(dict_input)
+        
 
 def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
     # insert info in the database. Takes in a dictionary of keys and
