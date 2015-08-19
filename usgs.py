@@ -17,7 +17,8 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
         dict_input['longitude']=coord[0]
         dict_input['latitude']=coord[1]
         dict_input['depth']=coord[2]
-        insertdb(dict_input)
+        if valid_location(dict_input):
+            insertdb(dict_input)
         
 
 def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
@@ -38,3 +39,26 @@ def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
     cur.execute(sqlcmd,sqlvalues)
     connection.commit()
     connection.close()
+
+def valid_location(dict_input):
+    #Checks if the location is in Washington or Southern California
+    place = dict_input['place'].lower()
+    gps = [dict_input[x] for x in ['latitude', 'longitude']]
+    if 'washington' in place:
+        return True
+    elif 'california' in place and in_socal(gps):
+        return True
+    else:
+        return False
+        
+def in_socal(gps):
+    #Define the line between Ventura and Las Vegas to be Southen California
+    #34.2750° N, 119.2278° W Ventura
+    #36.1215° N, 115.1739° W Las Vegas
+    slope = (36.1215 - 34.2750) / (115.1739 - 119.2278)
+    y = slope * (gps[1] - 119.2278) + 34.2750
+    if gps[0] < y:
+        return(True)
+    else:
+        return(False)
+    
