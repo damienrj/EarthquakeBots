@@ -3,7 +3,7 @@ import requests
 import sqlite3 as sqlite
 
 
-def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson'):
+def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
     # Read the USGS json feed and return only relavant quantities.
 
     resp = requests.get(feed_url)
@@ -18,7 +18,14 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
         dict_input['latitude']=coord[1]
         dict_input['depth']=coord[2]
         if valid_location(dict_input):
-            insertdb(dict_input)
+            
+            connection = sqlite.connect(dbfile)
+            cur = connection.cursor()
+            tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
+            if  len(tweet_test)  == 0 or (len(tweet_test) > 0 and tweet_test[0][0]==0):
+                print(dict_input['title'] + ' is ready to tweet')
+                
+                insertdb(dict_input)
         
 
 def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
@@ -63,4 +70,4 @@ def in_socal(gps):
         return(False)
     
 if __name__ == '__main__':
-    readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
+    readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson')
