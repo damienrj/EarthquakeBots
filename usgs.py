@@ -33,9 +33,9 @@ def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
     sqlcmd = 'insert or ignore into quakes '
     sqlcmd += '('+','.join(dict_input.keys())+') '
     sqlcmd += 'values ('+ ','.join(['?']*len(dict_input.keys()))+')'
-    print sqlcmd
+    #print sqlcmd
     sqlvalues = [dict_input[y] for y in dict_input.keys()]  # make sure the values come out the same order as the keys
-    print sqlvalues
+    #print sqlvalues
     cur.execute(sqlcmd,sqlvalues)
     connection.commit()
     connection.close()
@@ -53,8 +53,8 @@ def valid_location(dict_input):
         
 def in_socal(gps):
     #Define the line between Ventura and Las Vegas to be Southen California
-    #34.2750° N, 119.2278° W Ventura
-    #36.1215° N, 115.1739° W Las Vegas
+    #34.2750 N, 119.2278 W Ventura
+    #36.1215 N, 115.1739 W Las Vegas
     slope = (36.1215 - 34.2750) / (115.1739 - 119.2278)
     y = slope * (gps[1] - 119.2278) + 34.2750
     if gps[0] < y:
@@ -62,3 +62,5 @@ def in_socal(gps):
     else:
         return(False)
     
+if __name__ == '__main__':
+    readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
