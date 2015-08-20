@@ -4,7 +4,7 @@ import time
 
 
 while True:
-    usgs.readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
+    usgs.readfeed()
     
     #Twitter bot code checks for new quakes, tweets    
     time.sleep(60*10)
