@@ -23,13 +23,21 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
             connection = sqlite.connect(dbfile)
             cur = connection.cursor()
             tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
+            quake_time = time.asctime(time.gmtime(dict_input['time']/1000))
+            message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' UTC'
+            
+            dict_input['tweet'] = 1
+            dict_input['tweet_time'] = time.asctime(time.gmtime())
+            dict_input['tweet_text'] = message
+            
             if  len(tweet_test)  == 0:
-                print(dict_input['title'] + ' is ready to tweet')
+                print(message)
                 insertdb(dict_input)
             elif (len(tweet_test) > 0 and tweet_test[0][0]==0):
-                print('tweeted')
+                print(message)
                 cur.execute("UPDATE QUAKES SET tweet = 1, tweet_time = '" 
-                    + time.asctime(time.gmtime()) + 
+                    + dict_input['tweet_time'] +
+                    "', tweet_text = '" + dict_input['tweet_text'] + 
                     "' WHERE code == " + dict_input['code'])
             connection.commit()    
             connection.close()
