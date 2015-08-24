@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import sqlite3 as sqlite
+import time
 
 
 def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
@@ -22,12 +23,18 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
             connection = sqlite.connect(dbfile)
             cur = connection.cursor()
             tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
-            if  len(tweet_test)  == 0 or (len(tweet_test) > 0 and tweet_test[0][0]==0):
+            if  len(tweet_test)  == 0:
                 print(dict_input['title'] + ' is ready to tweet')
-                
                 insertdb(dict_input)
+            elif (len(tweet_test) > 0 and tweet_test[0][0]==0):
+                print('tweeted')
+                cur.execute("UPDATE QUAKES SET tweet = 1, tweet_time = '" 
+                    + time.asctime(time.gmtime()) + 
+                    "' WHERE code == " + dict_input['code'])
+            connection.commit()    
+            connection.close()
         
-
+#tweet_time = ' + time.asctime(time.gmtime())
 def insertdb(dict_input,dbfile='quakeBotDB.sqlite'):
     # insert info in the database. Takes in a dictionary of keys and
     # values and inserts those into the database
