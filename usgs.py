@@ -5,6 +5,25 @@ import time
 import tweepy
 import pandas as pd
 
+
+class Quake_bot:
+    def __init__(self, config_file):
+        df = pd.read_csv(config_file, header=None, index_col=[0]).transpose()
+        consumer_key = df.consumer_key.iloc[0]
+        consumer_secret = df.consumer_secret.iloc[0]
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        access_token = df.access_token.iloc[0]
+        access_token_secret = df.access_token_secret.iloc[0]
+        auth.set_access_token(access_token, access_token_secret)
+        self.api = tweepy.API(auth)
+ 
+    def tweet(self, message):
+        try:        
+            self.api.update_status(status=message)
+        except tweepy.TweepError as e:
+            print(e.message[0]['message'])
+        
+WA_bot = Quake_bot('botWA.config')
 def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
     # Read the USGS json feed and return only relavant quantities.
 
@@ -20,26 +39,42 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
         dict_input['latitude']=coord[1]
         dict_input['depth']=coord[2]
         if valid_location(dict_input):
-            
+            #Check if tweet is in datebase
             connection = sqlite.connect(dbfile)
             cur = connection.cursor()
+            
+            #Check if the quake was tweeted
             tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
-            quake_time = time.asctime(time.gmtime(dict_input['time']/1000))
-            message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' UTC'
+            quake_time = time.asctime(time.localtime(dict_input['time']/1000))
+            message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' PT'
             
             dict_input['tweet'] = 1
             dict_input['tweet_time'] = time.asctime(time.gmtime())
             dict_input['tweet_text'] = message
             
+            #Checks if quake was missing, or present but not tweeted
             if  len(tweet_test)  == 0:
-                print(message)
+                if 'Washington' in dict_input['place']:                
+                    WA_bot.tweet(message)
+                else:
+                    print('other bot')
+                #Insert values into database
                 insertdb(dict_input)
+                
             elif (len(tweet_test) > 0 and tweet_test[0][0]==0):
-                print(message)
+                #This section is in case a earthquake was seen but missed and
+                #not tweeted about
+                #Need to pick correct bot
+                if 'Washington' in dict_input['place']:                
+                    WA_bot.tweet(message)
+                else:
+                    print('other bot')
+                #Update tweet values
                 cur.execute("UPDATE QUAKES SET tweet = 1, tweet_time = '" 
                     + dict_input['tweet_time'] +
                     "', tweet_text = '" + dict_input['tweet_text'] + 
                     "' WHERE code == " + dict_input['code'])
+                    
             connection.commit()    
             connection.close()
         
@@ -86,19 +121,7 @@ def in_socal(gps):
         return(False)
         
 
-class Quake_bot:
-    def __init__(self, config_file):
-        df = pd.read_csv(config_file, header=None, index_col=[0]).transpose()
-        consumer_key = df.consumer_key.iloc[0]
-        consumer_secret = df.consumer_secret.iloc[0]
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        access_token = df.access_token.iloc[0]
-        access_token_secret = df.access_token_secret.iloc[0]
-        auth.set_access_token(access_token, access_token_secret)
-        self.api = tweepy.API(auth)
- 
-    def tweet(self, message):
-        self.api.update_status(status=message)
+
     
 if __name__ == '__main__':
     readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson')
