@@ -4,7 +4,7 @@ import sqlite3 as sqlite
 import time
 import tweepy
 import pandas as pd
-
+from mapping import *
 
 class Quake_bot:
     def __init__(self, config_file):
@@ -15,11 +15,13 @@ class Quake_bot:
         access_token = df.access_token.iloc[0]
         access_token_secret = df.access_token_secret.iloc[0]
         auth.set_access_token(access_token, access_token_secret)
+        self.google_api = df.google_api.iloc[0]
         self.api = tweepy.API(auth)
  
-    def tweet(self, message):
-        try:        
-            self.api.update_status(status=message)
+    def tweet(self, message, latitude, longitude):
+        try:
+            get_map(latitude, longitude,api=self.google_api )
+            self.api.update_with_media('map.png', status=message)
         except tweepy.TweepError as e:
             print(e.message[0]['message'])
         
@@ -55,9 +57,9 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
             #Checks if quake was missing, or present but not tweeted
             if  len(tweet_test)  == 0:
                 if 'Washington' in dict_input['place']:                
-                    WA_bot.tweet(message)
+                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
                 else:
-                    print('other bot')
+                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
                 #Insert values into database
                 insertdb(dict_input)
                 
@@ -66,7 +68,7 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
                 #not tweeted about
                 #Need to pick correct bot
                 if 'Washington' in dict_input['place']:                
-                    WA_bot.tweet(message)
+                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
                 else:
                     print('other bot')
                 #Update tweet values

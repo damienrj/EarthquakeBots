@@ -18,8 +18,8 @@ def get_map(latitude,longitude,size='512x512',maptype='terrain',
             
     url_call = "http://maps.googleapis.com/maps/api/staticmap?"+"center="+str(latitude)+","+str(longitude)+"&size="+size+"&maptype="+maptype+"&zoom="+str(zoom)+"&markers=color:"+markercolor+"%7ClabelG%7C"+str(latitude)+","+str(longitude)+"&key="+api
 
-    img = urllib.urlretrieve(url_call,save_file)
-
+    urllib.urlretrieve(url_call,save_file)
+    
 def get_map_from_db(code,dbfile='quakeBotDB.sqlite',**kwargs):
     # look in the database for a unique code to get the latitude and
     # longitude in order to get a map
