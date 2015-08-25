@@ -31,5 +31,5 @@ def get_map_from_db(code,dbfile='quakeBotDB.sqlite',**kwargs):
     results = cur.execute(sqlquery,(code,)).fetchall()
     if len(results) > 0:
         latitude, longitude = results[0]
-        print 'generating map'
+
         get_map(latitude,longitude,**kwargs)
