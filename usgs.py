@@ -2,7 +2,8 @@ import numpy as np
 import requests
 import sqlite3 as sqlite
 import time
-
+import tweepy
+import pandas as pd
 
 def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
     # Read the USGS json feed and return only relavant quantities.
@@ -83,6 +84,21 @@ def in_socal(gps):
         return(True)
     else:
         return(False)
+        
+
+class Quake_bot:
+    def __init__(self, config_file):
+        df = pd.read_csv(config_file, header=None, index_col=[0]).transpose()
+        consumer_key = df.consumer_key.iloc[0]
+        consumer_secret = df.consumer_secret.iloc[0]
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        access_token = df.access_token.iloc[0]
+        access_token_secret = df.access_token_secret.iloc[0]
+        auth.set_access_token(access_token, access_token_secret)
+        self.api = tweepy.API(auth)
+ 
+    def tweet(self, message):
+        self.api.update_status(status=message)
     
 if __name__ == '__main__':
     readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson')
