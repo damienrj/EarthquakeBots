@@ -25,11 +25,11 @@ class Quake_bot:
             
 bots={}
 bots['Washington'] =Quake_bot('botWA.config')
-bots['California'] =Quake_bot('botWA.config')        
-#while True:
-#    usgs.readfeed(bots)
-#    
-#    #Twitter bot code checks for new quakes, tweets    
-#    time.sleep(60*10)
+#bots['California'] =Quake_bot('botWA.config')        
+while True:
+    usgs.readfeed(bots)
     
-usgs.readfeed(bots, feed_url='http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
+    #Twitter bot code checks for new quakes, tweets    
+    time.sleep(60*10)
+    
+#usgs.readfeed(bots, feed_url='http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
