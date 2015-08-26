@@ -24,12 +24,12 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
             
             #Check if the quake was tweeted
             tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
-            quake_time = time.asctime(time.localtime(dict_input['time']/1000))
-            message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' PT'
+            quake_time = time.asctime(time.localtime(dict_input['time']/1000))[:-5]
+            message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' PT. ' + dict_input['url'] 
             
             dict_input['tweet'] = 1
             dict_input['tweet_time'] = time.asctime(time.gmtime())
-            dict_input['tweet_text'] = message
+            dict_input['tweet_text'] = message 
             
             #Checks if quake was missing, or present but not tweeted
             
