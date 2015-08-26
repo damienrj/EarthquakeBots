@@ -2,31 +2,8 @@ import numpy as np
 import requests
 import sqlite3 as sqlite
 import time
-import tweepy
-import pandas as pd
-from mapping import *
 
-class Quake_bot:
-    def __init__(self, config_file):
-        df = pd.read_csv(config_file, header=None, index_col=[0]).transpose()
-        consumer_key = df.consumer_key.iloc[0]
-        consumer_secret = df.consumer_secret.iloc[0]
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        access_token = df.access_token.iloc[0]
-        access_token_secret = df.access_token_secret.iloc[0]
-        auth.set_access_token(access_token, access_token_secret)
-        self.google_api = df.google_api.iloc[0]
-        self.api = tweepy.API(auth)
- 
-    def tweet(self, message, latitude, longitude):
-        try:
-            get_map(latitude, longitude,api=self.google_api )
-            self.api.update_with_media('map.png', status=message)
-        except tweepy.TweepError as e:
-            print(e.message[0]['message'])
-        
-WA_bot = Quake_bot('botWA.config')
-def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
+def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
     # Read the USGS json feed and return only relavant quantities.
 
     resp = requests.get(feed_url)
@@ -55,22 +32,26 @@ def readfeed(feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summar
             dict_input['tweet_text'] = message
             
             #Checks if quake was missing, or present but not tweeted
-            if  len(tweet_test)  == 0:
-                if 'Washington' in dict_input['place']:                
-                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
-                else:
-                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
-                #Insert values into database
+            
+            if 'Washington' in dict_input['place'] and 'Washington' in bots:                
+                
+                correct_bot=bots['Washington']
+            elif 'California' in dict_input['place'] and 'California' in bots:
+                correct_bot=bots['California']
+            else:
+                #If there is no correct bot, close the connection and continue                
+                connection.commit()    
+                connection.close()
+                continue
+            #Insert values into database
+            correct_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
+            if  len(tweet_test)  == 0:            
                 insertdb(dict_input)
                 
             elif (len(tweet_test) > 0 and tweet_test[0][0]==0):
                 #This section is in case a earthquake was seen but missed and
                 #not tweeted about
-                #Need to pick correct bot
-                if 'Washington' in dict_input['place']:                
-                    WA_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
-                else:
-                    print('other bot')
+            
                 #Update tweet values
                 cur.execute("UPDATE QUAKES SET tweet = 1, tweet_time = '" 
                     + dict_input['tweet_time'] +
@@ -126,4 +107,4 @@ def in_socal(gps):
 
     
 if __name__ == '__main__':
-    readfeed('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson')
+    print('Testing area')
