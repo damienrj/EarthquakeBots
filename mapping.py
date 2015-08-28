@@ -4,7 +4,7 @@ import os
 
 def get_map(latitude,longitude,size='512x512',maptype='terrain',
             markercolor='red',api_file='../google_api.key',api=None,
-            zoom = 12,save_file='map.png'):
+            zoom = 9,save_file='map.png'):
 
     # given a latitude and longitude, get a static map from Google
     # Maps using their API

@@ -96,8 +96,8 @@ def in_socal(gps):
     #Define the line between Ventura and Las Vegas to be Southen California
     #34.2750 N, 119.2278 W Ventura
     #36.1215 N, 115.1739 W Las Vegas
-    slope = (36.1215 - 34.2750) / (115.1739 - 119.2278)
-    y = slope * (gps[1] - 119.2278) + 34.2750
+    slope = (36.1215 - 34.2750) / (-115.1739 + 119.2278)
+    y = slope * (gps[1] + 119.2278) + 34.2750
     if gps[0] < y:
         return(True)
     else:
