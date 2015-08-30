@@ -44,10 +44,10 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
                 connection.close()
                 continue
             #Insert values into database
-            correct_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
+            
             if  len(tweet_test)  == 0:            
                 insertdb(dict_input)
-                
+                correct_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])
             elif (len(tweet_test) > 0 and tweet_test[0][0]==0):
                 #This section is in case a earthquake was seen but missed and
                 #not tweeted about
@@ -57,7 +57,7 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
                     + dict_input['tweet_time'] +
                     "', tweet_text = '" + dict_input['tweet_text'] + 
                     "' WHERE code == " + dict_input['code'])
-                    
+                correct_bot.tweet(message, dict_input['latitude'], dict_input['longitude'])    
             connection.commit()    
             connection.close()
         
