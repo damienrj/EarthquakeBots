@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/home/remote_damien/miniconda/bin/python
 import usgs
 import time
 import tweepy
