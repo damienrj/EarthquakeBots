@@ -18,6 +18,7 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
         dict_input['latitude']=coord[1]
         dict_input['depth']=coord[2]
         if valid_location(dict_input):
+
             #Check if tweet is in datebase
             connection = sqlite.connect(dbfile)
             cur = connection.cursor()
@@ -26,6 +27,7 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
             tweet_test = cur.execute('SELECT tweet FROM QUAKES WHERE code == ' + dict_input['code']).fetchall()
             quake_time = time.asctime(time.localtime(dict_input['time']/1000))[:-5]
             message = str(dict_input['mag']) + ' earthquake ' + dict_input['place'] + ' at ' + quake_time + ' PT. ' + dict_input['url']
+            print(message)
 
             dict_input['tweet'] = 1
             dict_input['tweet_time'] = time.asctime(time.gmtime())
@@ -36,7 +38,7 @@ def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/
             if 'Washington' in dict_input['place'] and 'Washington' in bots:
 
                 correct_bot=bots['Washington']
-            elif 'California' in dict_input['place'] and 'California' in bots:
+            elif ('California' in dict_input['place'] or dict_input['place'].endswith(', CA')) and 'California' in bots:
                 correct_bot=bots['California']
             else:
                 #If there is no correct bot, close the connection and continue
@@ -91,7 +93,7 @@ def valid_location(dict_input):
     gps = [dict_input[x] for x in ['latitude', 'longitude']]
     if 'washington' in place:
         return True
-    elif 'california' in place and in_socal(gps):
+    elif ('california' in place or place.endswith(', ca')) and in_socal(gps):
         return True
     else:
         return False
