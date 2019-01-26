@@ -4,6 +4,8 @@ import time
 import tweepy
 import pandas as pd
 from mapping import *
+
+
 class Quake_bot:
     def __init__(self, config_file):
         df = pd.read_csv(config_file, header=None, index_col=[0]).transpose()

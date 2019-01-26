@@ -2,8 +2,7 @@
 ####### Requirements for earthquake bot #######
 #
 ###### Requirements without Version Specifiers ######
-urllib
-sqlite3
 requests
 pandas
 tweepy
+ipython
