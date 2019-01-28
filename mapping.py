@@ -2,6 +2,7 @@ import urllib
 import sqlite3 as sqlite
 import os
 
+
 def get_map(latitude,longitude,size='512x512',maptype='terrain',
             markercolor='red',api_file='../google_api.key',api=None,
             zoom = 9,save_file='map.png'):
@@ -20,7 +21,7 @@ def get_map(latitude,longitude,size='512x512',maptype='terrain',
 
     urllib.urlretrieve(url_call,save_file)
     
-def get_map_from_db(code,dbfile='quakeBotDB.sqlite',**kwargs):
+def get_map_from_db(code,dbfile='/app/data/quakeBotDB.sqlite',**kwargs):
     # look in the database for a unique code to get the latitude and
     # longitude in order to get a map
 

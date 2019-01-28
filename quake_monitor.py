@@ -26,8 +26,8 @@ class Quake_bot:
             print(e.message[0]['message'])
             
 bots={}
-bots['Washington'] =Quake_bot('botWA.config')
-bots['California'] =Quake_bot('botSoCal.config')
+bots['Washington'] =Quake_bot('/app/data/botWA.config')
+bots['California'] =Quake_bot('/app/data/botSoCal.config')
 #bots['California'] =Quake_bot('botWA.config')        
 while True:
     usgs.readfeed(bots)

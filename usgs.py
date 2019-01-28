@@ -3,7 +3,8 @@ import requests
 import sqlite3 as sqlite
 import time
 
-def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='quakeBotDB.sqlite'):
+
+def readfeed(bots, feed_url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson', dbfile='/app/data/quakeBotDB.sqlite'):
     # Read the USGS json feed and return only relavant quantities.
 
     resp = requests.get(feed_url)
