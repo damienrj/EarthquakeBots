@@ -17,22 +17,23 @@ class Quake_bot:
         auth.set_access_token(access_token, access_token_secret)
         self.google_api = df.google_api.iloc[0]
         self.api = tweepy.API(auth)
- 
+
     def tweet(self, message, latitude, longitude):
         try:
-            get_map(latitude, longitude,api=self.google_api )
-            self.api.update_with_media('map.png', status=message)
+            get_map(latitude, longitude, api=self.google_api)
+            self.api.update_with_media("map.png", status=message)
         except tweepy.TweepError as e:
-            print(e.message[0]['message'])
-            
-bots={}
-bots['Washington'] =Quake_bot('/app/data/botWA.config')
-bots['California'] =Quake_bot('/app/data/botSoCal.config')
-#bots['California'] =Quake_bot('botWA.config')        
+            print(e.message[0]["message"])
+
+
+bots = {}
+bots["Washington"] = Quake_bot("/app/data/botWA.config")
+bots["California"] = Quake_bot("/app/data/botSoCal.config")
+# bots['California'] =Quake_bot('botWA.config')
 while True:
     usgs.readfeed(bots)
-    
-    #Twitter bot code checks for new quakes, tweets    
-    time.sleep(60*10)
-    
-#usgs.readfeed(bots, feed_url='http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
+    # Twitter bot code checks for new quakes, tweets
+    time.sleep(60 * 10)
+
+# usgs.readfeed(bots, feed_url='http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
+
