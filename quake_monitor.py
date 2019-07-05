@@ -2,6 +2,7 @@
 import usgs
 import time
 import tweepy
+import traceback
 import pandas as pd
 from mapping import *
 
@@ -31,9 +32,11 @@ bots["Washington"] = Quake_bot("/app/data/botWA.config")
 bots["California"] = Quake_bot("/app/data/botSoCal.config")
 # bots['California'] =Quake_bot('botWA.config')
 while True:
-    usgs.readfeed(bots)
+    try:
+        usgs.readfeed(bots)
+    except Exception as e:
+        print(traceback.format_exc())
     # Twitter bot code checks for new quakes, tweets
     time.sleep(60 * 10)
 
 # usgs.readfeed(bots, feed_url='http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson')
-

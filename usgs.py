@@ -143,4 +143,3 @@ def in_socal(gps):
 
 if __name__ == "__main__":
     print("Testing area")
-
