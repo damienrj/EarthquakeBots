@@ -18,6 +18,9 @@ def readfeed(
     n = len(j["features"])
     for i in xrange(n):
         dict_input = j["features"][i]["properties"]
+        if dict_input.get('mag') < 3.5:
+            continue
+
         coord = j["features"][i]["geometry"]["coordinates"]
         dict_input["longitude"] = coord[0]
         dict_input["latitude"] = coord[1]
